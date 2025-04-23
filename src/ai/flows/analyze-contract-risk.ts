@@ -13,15 +13,15 @@ import {getDocumentMetadata} from '@/services/document-metadata';
 
 const AnalyzeContractRiskInputSchema = z.object({
   documentText: z.string().describe('The text content of the contract document.'),
-  contractType: z.enum(['NDA', 'MSA']).describe('The type of contract being analyzed.'),
+  contractType: z.enum(['NDA', 'MSA']).describe('The type of contract being analyzed.').default('NDA'),
 });
 export type AnalyzeContractRiskInput = z.infer<typeof AnalyzeContractRiskInputSchema>;
 
 const AnalyzeContractRiskOutputSchema = z.object({
   metadata: z.object({
     effectiveDate: z.string().nullable().optional().describe('The effective date of the contract, if found.'),
-    renewalDeadline: z.number().nullable().optional().describe('The renewal deadline of the contract, if found. if not found, then set to null'),
-    optOutDeadline: z.number().nullable().optional().describe('The opt-out deadline of the contract, if found. if not found, then set to null'),
+    renewalDeadline: z.string().nullable().optional().describe('The renewal deadline of the contract, if found. if not found, then set to null'),
+    optOutDeadline: z.string().nullable().optional().describe('The opt-out deadline of the contract, if found. if not found, then set to null'),
     parties: z.array(z.string().describe('Parties identified in the contract.')).describe('Parties involved in the contract.'),
     governingLaw: z.string().nullable().optional().describe('The governing law of the contract, if specified.'),
     venue: z.string().nullable().optional().describe('The venue for dispute resolution, if specified.'),
@@ -65,8 +65,8 @@ const extractContractMetadata = ai.defineTool({
   }),
   outputSchema: z.object({
     effectiveDate: z.string().nullable().optional().describe('The effective date of the contract, if found.'),
-    renewalDeadline: z.number().nullable().optional().describe('The renewal deadline of the contract, if found.'),
-    optOutDeadline: z.number().nullable().optional().describe('The opt-out deadline of the contract, if found.'),
+    renewalDeadline: z.string().nullable().optional().describe('The renewal deadline of the contract, if found.'),
+    optOutDeadline: z.string().nullable().optional().describe('The opt-out deadline of the contract, if found.'),
     parties: z.array(z.string().describe('Parties identified in the contract.')).describe('Parties involved in the contract.'),
     governingLaw: z.string().nullable().optional().describe('The governing law of the contract, if specified.'),
     venue: z.string().nullable().optional().describe('The venue for dispute resolution, if specified.'),
@@ -266,8 +266,8 @@ const analyzeContractRiskFlow = ai.defineFlow<
   const {output} = await prompt(input);
   // Ensure renewalDeadline and optOutDeadline are numbers or null
   if (output?.metadata) {
-    output.metadata.renewalDeadline = output.metadata.renewalDeadline === null ? null : Number(output.metadata.renewalDeadline);
-    output.metadata.optOutDeadline = output.metadata.optOutDeadline === null ? null : Number(output.metadata.optOutDeadline);
+    output.metadata.renewalDeadline = output.metadata.renewalDeadline === null ? null : String(output.metadata.renewalDeadline);
+    output.metadata.optOutDeadline = output.metadata.optOutDeadline === null ? null : String(output.metadata.optOutDeadline);
   }
   return output!;
 });
