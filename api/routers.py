@@ -27,6 +27,8 @@ from api.dependencies import get_db
 from services.document_ingestion import ingest_document, IngestionError
 from models.contract import Contract as ContractModel  # Renamed to avoid collision
 from services.document_retrieval import DocumentRetrievalService
+import os
+from services.document_upload import process_uploaded_file
 
 
 router = APIRouter()
@@ -45,7 +47,24 @@ async def upload_contract(
     Performs OCR/Zonal parsing, text normalization, and PII redaction.
     """
     try:
-        contract = await ingest_document(file, db)  # Pass db to ingest_document
+        file_content = await file.read()
+        if not file_content:
+            raise IngestionError("Uploaded file is empty.")
+
+        # Determine file type and process accordingly
+        file_type = file.content_type
+        if file_type not in ["application/pdf", "text/plain", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/csv"]:
+            raise IngestionError(f"Unsupported file type: {file_type}")
+
+        # Save the file temporarily
+        file_path = f"temp_files/{file.filename}"
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)  # Ensure directory exists
+
+        with open(file_path, "wb") as f:
+            f.write(file_content)
+
+        contract = await process_uploaded_file(file_path, db)
+
         background_tasks.add_task(
             persist_contract, contract, db
         )  # Persist in background
@@ -58,7 +77,6 @@ async def upload_contract(
         raise HTTPException(
             status_code=500, detail="Internal server error during upload."
         )
-
 
 def persist_contract(contract: Contract, db: Session):
     """Persists the contract to the database."""
@@ -274,3 +292,12 @@ async def metrics():
     """
     # In a real implementation, you would collect and format metrics here.
     return {"message": "Prometheus metrics endpoint (example)"}
+'''''
+@router.get("/ui", tags=["UI Dummy"])
+async def ui_dummy():
+    """
+    UI endpoint.
+    """
+    # In a real implementation, you would collect and format metrics here.
+    return {"message": "UI endpoint (example)"}
+'''''
