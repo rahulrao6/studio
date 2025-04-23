@@ -81,8 +81,8 @@ const extractContractMetadata = ai.defineTool({
     parties: metadata.parties,
     governingLaw: metadata.governingLaw,
     venue: metadata.venue,
-    definitions: {}, // Placeholder
-    slaReferences: [], // Placeholder
+    definitions: metadata.definitions,
+    slaReferences: metadata.slaReferences,
   };
 });
 
