@@ -32,7 +32,7 @@ const AnalyzeContractRiskOutputSchema = z.object({
     sections: z.array(z.object({
       sectionTitle: z.string(),
       summary: z.string(),
-      highestRiskClause: z.string().optional().describe('The highest-risk clause in the section.')
+      highestRiskClause: z.string().optional().nullable().describe('The highest-risk clause in the section.')
     })).describe('Plain-English summaries per section of the contract.')
   }).describe('Executive summaries of the contract.'),
   riskItems: z.array(
@@ -154,7 +154,7 @@ const generateExecutiveAndSectionSummaries = ai.defineTool({
       sections: z.array(z.object({
         sectionTitle: z.string(),
         summary: z.string(),
-        highestRiskClause: z.string().optional().describe('The highest-risk clause in the section.')
+        highestRiskClause: z.string().optional().nullable().describe('The highest-risk clause in the section.')
       })).describe('Plain-English summaries per section of the contract.')
     }).describe('Executive summaries of the contract.'),
   }),
@@ -171,7 +171,7 @@ const generateExecutiveAndSectionSummaries = ai.defineTool({
         { sectionTitle: 'Liability', summary: 'Liability is limited for the provider.', highestRiskClause: 'Liability clause' },
         { sectionTitle: 'Indemnification', summary: 'Indemnification is required by the customer.', highestRiskClause: 'Indemnification clause' },
         { sectionTitle: 'Dispute Resolution', summary: 'Dispute resolution is specified.', highestRiskClause: null },
-      ]
+      ].map(section => ({...section, highestRiskClause: section.highestRiskClause ?? null}))
     }
   };
 });
