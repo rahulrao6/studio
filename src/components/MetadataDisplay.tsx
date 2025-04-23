@@ -12,6 +12,22 @@ interface MetadataDisplayProps {
   documentText: string;
 }
 
+const CardDescription = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
+))
+CardDescription.displayName = "CardDescription";
+
+function cn(...inputs: (string | undefined | null)[]): string {
+  return inputs.filter(Boolean).join(' ');
+}
+
 export const MetadataDisplay: React.FC<MetadataDisplayProps> = ({ results, documentText }) => {
   return (
     <Card>
@@ -182,18 +198,3 @@ export const MetadataDisplay: React.FC<MetadataDisplayProps> = ({ results, docum
     </Card>
   );
 };
-
-const CardDescription = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
-    {...props}
-  />
-))
-CardDescription.displayName = "CardDescription";
-function cn(...inputs: (string | undefined | null)[]): string {
-  return inputs.filter(Boolean).join(' ');
-}

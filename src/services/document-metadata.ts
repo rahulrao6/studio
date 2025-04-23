@@ -1,3 +1,4 @@
+
 /**
  * Represents metadata extracted from a document.
  */
