@@ -22,6 +22,10 @@ export interface DocumentMetadata {
    * A list of parties involved in the contract.
    */
   parties: string[];
+    /**
+   * The effective date of the contract, if available.
+   */
+  effectiveDate?: string;
 }
 
 /**
@@ -39,5 +43,6 @@ export async function getDocumentMetadata(document: string): Promise<DocumentMet
     wordCount: 2500,
     detectedDates: ['January 1, 2024', 'December 31, 2024'],
     parties: ['Company A', 'Company B'],
+    effectiveDate: 'January 1, 2024',
   };
 }
