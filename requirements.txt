@@ -1,0 +1,25 @@
+from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import Optional
+import uvicorn
+from fastapi import FastAPI, HTTPException, Depends, UploadFile, File
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, Boolean
+from sqlalchemy.orm import sessionmaker, declarative_base, Session
+from sqlalchemy.exc import SQLAlchemyError
+from datetime import datetime
+import uuid
+import os
+from dotenv import load_dotenv
+from typing import List, Dict
+from PyPDF2 import PdfReader
+import httpx
+import json
+from fastapi.middleware.cors import CORSMiddleware
+import logging
+
+app = FastAPI(
+    title="CounselAI-Pro",
+    version="0.1.0",
+    description="A legal contract analysis microservice.",
+)
