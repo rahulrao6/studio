@@ -188,24 +188,6 @@ const assessRegulatoryCompliance = ai.defineTool({
   return 75; // Example compliance score
 });
 
-const assessSemanticBenchmarking = ai.defineTool({
-  name: 'assessSemanticBenchmarking',
-  description: 'Compares the risk items to industry prevalence via CAUD dataset and provides benchmarking insights.',
-  inputSchema: z.object({
-    riskItems: z.array(
-      z.object({
-        clauseText: z.string().describe('The text of the risky clause.'),
-        riskCategory: z.string().describe('The category of risk associated with the clause.'),
-      })
-    ).describe('A list of clauses identified as potentially risky.'),
-  }),
-  outputSchema: z.array(z.string()).describe('Insights based on CAUD dataset.'),
-  async run(input) {
-    // TODO: Implement the logic to assess semantic benchmarking.
-    return input.riskItems.map(item => `Risk for ${item.riskCategory} is within industry standards.`);
-  }
-});
-
 const prompt = ai.definePrompt({
   name: 'analyzeContractRiskPrompt',
   tools: [extractContractMetadata, analyzeRisksAndGenerateSuggestions, generateExecutiveAndSectionSummaries, assessRegulatoryCompliance],

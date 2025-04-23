@@ -17,6 +17,7 @@ import httpx
 import json
 from fastapi.middleware.cors import CORSMiddleware
 import logging
+import spacy
 
 app = FastAPI(
     title="CounselAI-Pro",
