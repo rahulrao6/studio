@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from models.clause import Clause
 from models.risk_report import RiskReport
 import re
@@ -36,6 +36,8 @@ class RiskScoringService:
         self.auto_renewal_patterns = [r"automatically renew", r"unless notice is given"]
         self.force_majeure_patterns = [r"act of god", r"unforeseen circumstances"]
         self.security_patterns = [r"data breach", r"cybersecurity incident"]
+        self.data_privacy_patterns = [r"personal data", r"personally identifiable information", r"pii"]
+
 
     def score_clauses(self, clauses: List[Clause]) -> RiskReport:
         """Scores clauses and generates a risk report."""
@@ -117,6 +119,10 @@ class RiskScoringService:
         if any(pattern.search(text) for pattern in self.security_patterns):
             score += 0.5
             risk_factors.append("Security/Data Breach Pattern Detected")
+        if any(pattern.search(text) for pattern in self.data_privacy_patterns):
+            score += 0.6
+            risk_factors.append("Data privacy/PII risk detected")
+
 
         score = min(score, 1.0)  # Cap the score
 
