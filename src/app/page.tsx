@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { DocumentUpload } from "@/components/DocumentUpload";
-import { RiskAnalysis } from "@/components/RiskAnalysis";
 import { MetadataDisplay } from "@/components/MetadataDisplay";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -54,7 +53,7 @@ export default function Home() {
           </CardHeader>
           <CardContent>
             {analysisResults ? (
-              <RiskAnalysis results={analysisResults} />
+              <p>Analysis Results available in Metadata Display</p>
             ) : (
               <p>No analysis results yet. Upload a document and click Analyze.</p>
             )}

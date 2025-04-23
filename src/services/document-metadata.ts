@@ -22,10 +22,26 @@ export interface DocumentMetadata {
    * A list of parties involved in the contract.
    */
   parties: string[];
-    /**
+  /**
+   * The renewal deadline of the contract, if available.
+   */
+  renewalDeadline?: string;
+  /**
+   * The opt-out deadline of the contract, if available.
+   */
+  optOutDeadline?: string;
+  /**
    * The effective date of the contract, if available.
    */
   effectiveDate?: string;
+  /**
+   * The governing law of the contract, if available.
+   */
+  governingLaw?: string;
+  /**
+   * The venue for dispute resolution, if available.
+   */
+  venue?: string;
 }
 
 /**
@@ -43,6 +59,10 @@ export async function getDocumentMetadata(document: string): Promise<DocumentMet
     wordCount: 2500,
     detectedDates: ['January 1, 2024', 'December 31, 2024'],
     parties: ['Company A', 'Company B'],
+    renewalDeadline: 'December 1, 2024',
+    optOutDeadline: 'November 1, 2024',
     effectiveDate: 'January 1, 2024',
+    governingLaw: 'Delaware Law',
+    venue: 'Delaware Court of Chancery',
   };
 }
