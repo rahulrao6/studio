@@ -25,11 +25,11 @@ export interface DocumentMetadata {
   /**
    * The renewal deadline of the contract, if available.
    */
-  renewalDeadline?: string;
+  renewalDeadline?: string | null;
   /**
    * The opt-out deadline of the contract, if available.
    */
-  optOutDeadline?: string;
+  optOutDeadline?: string | null;
   /**
    * The effective date of the contract, if available.
    */
@@ -42,6 +42,15 @@ export interface DocumentMetadata {
    * The venue for dispute resolution, if available.
    */
   venue?: string;
+  /**
+   * Extracted definitions from the contract.
+   */
+  definitions: { [term: string]: string };
+
+  /**
+   * SLA references, if any.
+   */
+  slaReferences?: string[];
 }
 
 /**
@@ -59,10 +68,16 @@ export async function getDocumentMetadata(document: string): Promise<DocumentMet
     wordCount: 2500,
     detectedDates: ['January 1, 2024', 'December 31, 2024'],
     parties: ['Company A', 'Company B'],
-    renewalDeadline: 'December 1, 2024',
-    optOutDeadline: 'November 1, 2024',
+    renewalDeadline: null,
+    optOutDeadline: null,
     effectiveDate: 'January 1, 2024',
     governingLaw: 'Delaware Law',
     venue: 'Delaware Court of Chancery',
+    definitions: {
+      "Confidential Information": "all non-public information disclosed by one party to the other, including without limitation pricing, forecasts, customer data, business strategies, and technical information",
+      "Services": "the software-as-a-service offerings, support, and related professional services provided by Provider under this Agreement",
+      "Initial Term": "one (1) year"
+    },
+    slaReferences: ["SLA"]
   };
 }
