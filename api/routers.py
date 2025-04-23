@@ -26,6 +26,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from api.dependencies import get_db
 from services.document_ingestion import ingest_document, IngestionError
 from models.contract import Contract as ContractModel  # Renamed to avoid collision
+from services.document_retrieval import DocumentRetrievalService
 
 
 router = APIRouter()
@@ -228,6 +229,32 @@ async def get_contract_metadata(
         logger.exception(f"Error extracting metadata for contract {contract_id}")
         raise HTTPException(
             status_code=500, detail="Error extracting metadata"
+        )
+
+@router.get(
+    "/contracts/{contract_id}/compare", response_model=List[Contract], tags=["Analysis"]
+)
+async def compare_contract(
+    contract_id: int,
+    num_results: int = 3,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(dependencies.get_db),
+):
+    """
+    Returns the top-N similar contracts from the database.
+    """
+    try:
+        contract = db.get(ContractModel, contract_id)
+        if not contract:
+            raise HTTPException(status_code=404, detail="Contract not found")
+
+        document_retrieval_service = DocumentRetrievalService()
+        similar_contracts = await document_retrieval_service.retrieve_similar_documents(contract.text, num_results)
+        return similar_contracts
+    except Exception as e:
+        logger.exception(f"Error retrieving similar contracts for contract {contract_id}")
+        raise HTTPException(
+            status_code=500, detail="Error retrieving similar contracts"
         )
 
 

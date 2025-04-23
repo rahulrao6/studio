@@ -1,20 +1,21 @@
-from typing import List
-from models.clause import Clause
-import spacy
 import re
-from utils.logging import logger  # Import logger
-from core.config import settings  # Import settings
+from typing import List
+import spacy
+from spacy.language import Language
+from models.clause import Clause
+from utils.logging import logger
+from core.config import settings
 from transformers import pipeline
 
 class ClauseExtractionService:
     def __init__(self):
         try:
-            self.nlp = spacy.load("en_core_web_lg")
+            self.nlp: Language = spacy.load("en_core_web_lg")
             logger.info("spaCy model loaded successfully.")
         except OSError:
             logger.warning("Downloading en_core_web_lg spaCy model...")
             spacy.cli.download("en_core_web_lg")
-            self.nlp = spacy.load("en_core_web_lg")
+            self.nlp: Language = spacy.load("en_core_web_lg")
             logger.info("spaCy model downloaded and loaded.")
 
         # Load a pre-trained transformer model for clause classification
@@ -33,38 +34,61 @@ class ClauseExtractionService:
     def extract_clauses(self, text: str) -> List[Clause]:
         """
         Extracts clauses from a contract text using NLP, classifies them, and
-        identifies cross-references.
+        identifies cross-references. Implements a heuristic approach with semantic
+        segmentation and attempts to recognize clause titles/headers.
         """
-        doc = self.nlp(text)
         clauses: List[Clause] = []
         clause_id = 0
+        segments = self.segment_text(text)
 
-        for sent in doc.sents:
-            clause_text = sent.text.strip()
-            if clause_text:
-                clause_type = self.determine_clause_type(clause_text)
-                risk_score = self.calculate_risk_score(clause_text)
+        for segment_text in segments:
+            clause_type = self.determine_clause_type(segment_text)
+            risk_score = self.calculate_risk_score(segment_text)
 
-                clause = Clause(
-                    id=clause_id,
-                    type=clause_type,
-                    text=clause_text,
-                    precision_score=0.8,  # Placeholder, replace with actual score
-                    risk_score=risk_score,
-                    references=self.find_clause_references(clause_text, doc),
-                    party="Unknown",  # To be populated later
-                )
-                clauses.append(clause)
-                clause_id += 1
+            clause = Clause(
+                id=clause_id,
+                type=clause_type,
+                text=segment_text,
+                precision_score=0.8,  # Placeholder
+                risk_score=risk_score,
+                references=self.find_clause_references(segment_text),
+                party="Unknown",  # To be populated later
+            )
+            clauses.append(clause)
+            clause_id += 1
 
         self.build_clause_graph(clauses)
         return clauses
 
+    def segment_text(self, text: str) -> List[str]:
+        """
+        Segments the contract text into clauses using regex, spaCy, and header detection.
+        """
+        # Split by common clause delimiters (e.g., "1. ", "A. ", "(a)")
+        clause_delimiters = r"\n(?:\d+\.|[A-Z]\.|[a-z]\))\s"
+        segments = re.split(clause_delimiters, text)
+        segments = [s.strip() for s in segments if s.strip()]
+
+        # Further refine segmentation using spaCy to handle complex sentences and phrasing
+        refined_segments: List[str] = []
+        for segment in segments:
+            doc = self.nlp(segment)
+            for sent in doc.sents:
+                refined_segments.append(sent.text.strip())
+
+        return refined_segments
+
     def determine_clause_type(self, text: str) -> str:
-        """Determines the type of a clause based on NLP and Transformer model."""
+        """
+        Determines the type of a clause based on NLP and Transformer model.
+        Leverages self.is_clause_header to improve accuracy.
+        """
+        if self.is_clause_header(text):
+            return "header"  # Mark as header
+
         if self.classifier:
             try:
-                classification = self.classifier(text,truncation=True, max_length=512)
+                classification = self.classifier(text, truncation=True, max_length=512)
                 predicted_label = classification[0]["label"]
                 logger.debug(f"Clause classification: {predicted_label}")
                 return predicted_label
@@ -73,6 +97,17 @@ class ClauseExtractionService:
                 return self.rule_based_clause_type(text)
         else:
             return self.rule_based_clause_type(text)
+
+    def is_clause_header(self, text: str) -> bool:
+        """
+        Heuristic to determine if a segment is a clause header/title.
+        """
+        # Check for common header patterns: uppercase, short length, numbering
+        if re.match(r"^(?:\d+\.|[A-Z]\.|[a-z]\))", text):
+            return True
+        if len(text.split()) <= 5 and text.upper() == text:
+            return True
+        return False
 
     def rule_based_clause_type(self, text: str) -> str:
         """Fallback rule-based clause typing."""
@@ -124,7 +159,7 @@ class ClauseExtractionService:
             score += 0.2
         return min(score, 1.0)
 
-    def find_clause_references(self, text: str, doc: spacy.tokens.Doc) -> List[str]:
+    def find_clause_references(self, text: str) -> List[str]:
         """Identifies cross-references to other clauses (e.g., "See Section 5.2")."""
         references = []
         for match in re.finditer(r"(?:Section|Clause)\s+(\d+(?:\.\d+)?(?:[a-z]+)?)", text):

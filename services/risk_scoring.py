@@ -37,7 +37,8 @@ class RiskScoringService:
         self.force_majeure_patterns = [r"act of god", r"unforeseen circumstances"]
         self.security_patterns = [r"data breach", r"cybersecurity incident"]
         self.data_privacy_patterns = [r"personal data", r"personally identifiable information", r"pii"]
-
+        self.missing_injunctive_relief_pattern = r"injunctive relief"
+        self.missing_liquidated_damages_pattern = r"liquidated damages"
 
     def score_clauses(self, clauses: List[Clause]) -> RiskReport:
         """Scores clauses and generates a risk report."""
@@ -62,14 +63,21 @@ class RiskScoringService:
         else:
             overall_score = 0
 
+        # Calibrate overall score based on contract type (NDA vs MSA)
+        overall_score = self.calibrate_overall_risk_score(overall_score, "MSA")  # Assuming MSA for this example
+
         compliance_score = self.calculate_compliance_score(overall_score)
         suggestions = self.generate_suggestions(clauses, overall_score)
+
+        # Prioritize key negotiation points
+        negotiation_points = self.get_negotiation_points(clauses)
 
         return RiskReport(
             clause_risks=clause_risks,
             overall_score=overall_score,
             compliance_score=compliance_score,
             suggestions=suggestions,
+            negotiation_points = negotiation_points, #add negotiation points
         )
 
     def calculate_clause_risk(self, clause: Clause) -> Dict:
@@ -91,7 +99,6 @@ class RiskScoringService:
                 elif risk_label == "Medium Risk":
                     score += risk_confidence * 0.5
                     risk_factors.append(f"Transformer: Medium Risk ({risk_confidence:.2f})")
-
             except Exception as e:
                 logger.warning(f"Transformer risk analysis failed: {e}. Using keyword-based analysis.")
                 # Fallback to keyword-based analysis if transformer fails
@@ -126,7 +133,7 @@ class RiskScoringService:
 
         score = min(score, 1.0)  # Cap the score
 
-        return {"score": score, "factors": risk_factors}
+        return {"score": score, "factors": risk_factors, "suggestions": self.generate_clause_suggestions(clause)}
 
     def keyword_based_risk(self, text: str) -> Tuple[float, List[str]]:
         """Calculates risk based on keyword matching."""
@@ -159,3 +166,52 @@ class RiskScoringService:
             if clause.risk_score > 0.8:
                 suggestions.append(f"Review clause {clause.id} due to high-risk keywords.")
         return suggestions
+
+    def calibrate_overall_risk_score(self, score: float, contract_type: str) -> float:
+        """Calibrates the overall risk score based on the contract type."""
+        if contract_type == "NDA":
+            score = min(20, score * 20)  # NDA - Cap at 20
+        elif contract_type == "MSA":
+            score = min(85, 70 + score * 15)  # MSA - Range between 70-85
+        return score
+
+    def generate_clause_suggestions(self, clause: Clause) -> List[str]:
+        """Generates specific suggestions for a clause based on identified risks."""
+        suggestions = []
+        text = clause.text.lower()
+
+        if "liability" in text:
+            suggestions.append("Consider limiting liability to the extent permitted by law.")
+        if "terminate" in text:
+            suggestions.append("Ensure termination rights are balanced and clearly defined.")
+        if "exclusive" in text:
+            suggestions.append("Review the scope and duration of exclusivity provisions.")
+        if re.search(self.missing_injunctive_relief_pattern, text) is None:
+            suggestions.append("Consider adding an injunctive relief clause to protect confidential information.")
+        if re.search(self.missing_liquidated_damages_pattern, text) is None:
+            suggestions.append("Consider adding a liquidated damages clause to address potential breaches.")
+        return suggestions
+
+    def get_negotiation_points(self, clauses: List[Clause]) -> List[str]:
+        """Prioritizes key negotiation points based on risk and other factors."""
+        negotiation_points = []
+
+        # Prioritize based on patterns first
+        if any(re.search(self.missing_injunctive_relief_pattern, clause.text.lower()) is None for clause in clauses):
+            negotiation_points.append("Add injunctive relief / equitable remedies")
+        if any("data-return" in clause.text.lower() for clause in clauses):
+            negotiation_points.append("Ensure data-return/destroy timelines are clear and reasonable")
+        # Removed 'hidden' from list, and just keep it as 'removal of fees'
+        if any("fee" in clause.text.lower() for clause in clauses):
+            negotiation_points.append("Removal of hidden/unilateral fees")
+
+
+        # Add other negotiation points based on keyword matches
+        for clause in clauses:
+            if "liability" in clause.text.lower() and "Consider limiting liability" not in negotiation_points:
+                negotiation_points.append("Limit the Provider's Liability")
+            if "termination" in clause.text.lower() and "Ensure termination rights" not in negotiation_points:
+                negotiation_points.append("Balance Termination Rights for both parties")
+
+
+        return negotiation_points

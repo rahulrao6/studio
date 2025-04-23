@@ -25,11 +25,11 @@ export interface DocumentMetadata {
   /**
    * The renewal deadline of the contract, if available.
    */
-  renewalDeadline?: string | null;
+  renewalDeadline?: number | null;
   /**
    * The opt-out deadline of the contract, if available.
    */
-  optOutDeadline?: string | null;
+  optOutDeadline?: number | null;
   /**
    * The effective date of the contract, if available.
    */
