@@ -1,4 +1,4 @@
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 from functools import lru_cache
 import os
 import logging
@@ -10,6 +10,7 @@ load_dotenv()
 class Settings(BaseSettings):
     app_name: str = "CounselAI-Pro"
     admin_email: str = "admin@example.com"
+    google_genai_api_key: str = None  # Add this line
     items_per_user: int = 50
     environment: str = os.getenv("ENVIRONMENT", "development")
     log_level: str = os.getenv("LOG_LEVEL", "INFO")
@@ -31,8 +32,11 @@ class Settings(BaseSettings):
     enable_encryption: bool = os.getenv("ENABLE_ENCRYPTION", "false").lower() == "true"
     allowed_origins: list = ["*"]  # Configure CORS carefully in production
 
-    class Config:
-        env_file = ".env"
+    model_config = {
+        "extra": "allow",  # To handle extra fields 
+        "protected_namespaces": ('settings_',),  # To resolve model_path warning
+        "env_file": ".env"  # This is how you specify env file in v2
+    }
 
 
 @lru_cache()

@@ -3,7 +3,6 @@ from typing import List
 import spacy
 from spacy.language import Language
 from models.clause import Clause
-from utils.logging import logger
 from core.config import settings
 from transformers import pipeline
 
