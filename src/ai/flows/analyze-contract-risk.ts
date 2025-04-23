@@ -264,5 +264,10 @@ const analyzeContractRiskFlow = ai.defineFlow<
   outputSchema: AnalyzeContractRiskOutputSchema,
 }, async input => {
   const {output} = await prompt(input);
+  // Ensure renewalDeadline and optOutDeadline are strings or null
+  if (output?.metadata) {
+    output.metadata.renewalDeadline = output.metadata.renewalDeadline === null ? null : String(output.metadata.renewalDeadline);
+    output.metadata.optOutDeadline = output.metadata.optOutDeadline === null ? null : String(output.metadata.optOutDeadline);
+  }
   return output!;
 });
