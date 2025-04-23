@@ -32,3 +32,4 @@ export const RiskAnalysis: React.FC<RiskAnalysisProps> = ({ results }) => {
     </div>
   );
 };
+
