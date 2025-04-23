@@ -29,7 +29,7 @@ from models.contract import Contract as ContractModel  # Renamed to avoid collis
 from services.document_retrieval import DocumentRetrievalService
 import os
 from services.document_upload import process_uploaded_file
-
+from src.ai.flows.analyze_contract_risk import analyzeContractRisk, AnalyzeContractRiskInput, AnalyzeContractRiskOutput
 
 router = APIRouter()
 
@@ -197,7 +197,6 @@ async def get_contract_rights(
 
 @router.get(
     "/contracts/{contract_id}/risk", response_model=RiskReport, tags=["Analysis"]
-)
 async def get_contract_risk_report(
     contract_id: int,
     current_user: User = Depends(get_current_user),
@@ -274,6 +273,20 @@ async def compare_contract(
         raise HTTPException(
             status_code=500, detail="Error retrieving similar contracts"
         )
+
+@router.post("/analyze", response_model=AnalyzeContractRiskOutput, tags=["AI Analysis"])
+async def analyze_contract_endpoint(
+    input_data: AnalyzeContractRiskInput,
+):
+    """
+    Analyzes a contract using the AI flow and returns the results.
+    """
+    try:
+        results = await analyzeContractRisk(input_data)
+        return results
+    except Exception as e:
+        logger.exception(f"Error during AI contract analysis: {e}")
+        raise HTTPException(status_code=500, detail=f"AI analysis failed: {e}")
 
 
 @router.get("/health", tags=["Metadata"])

@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export default function Home() {
   const [documentText, setDocumentText] = useState<string | null>(null);
   const [analysisResults, setAnalysisResults] = useState<any | null>(null);
-    const [contractType, setContractType] = useState<"NDA" | "MSA">("NDA");
+    const [contractType, setContractType] = useState<string>("NDA");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleDocumentUpload = (text: string) => {
@@ -49,13 +49,15 @@ export default function Home() {
             <DocumentUpload onDocumentUpload={handleDocumentUpload} />
             <div className="grid gap-2">
                 <Label htmlFor="contract-type">Contract Type</Label>
-                <Select value={contractType} onValueChange={value => setContractType(value as "NDA" | "MSA")}>
+                <Select value={contractType} onValueChange={value => setContractType(value as string)}>
                     <SelectTrigger id="contract-type">
                         <SelectValue placeholder="Select contract type" />
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="NDA">NDA</SelectItem>
                         <SelectItem value="MSA">MSA</SelectItem>
+                        <SelectItem value="Lease">Lease</SelectItem>
+                        <SelectItem value="Employment Agreement">Employment Agreement</SelectItem>
                     </SelectContent>
                 </Select>
             </div>

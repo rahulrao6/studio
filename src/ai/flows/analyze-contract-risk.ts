@@ -13,7 +13,7 @@ import {getDocumentMetadata} from '@/services/document-metadata';
 
 const AnalyzeContractRiskInputSchema = z.object({
   documentText: z.string().describe('The text content of the contract document.'),
-  contractType: z.enum(['NDA', 'MSA']).describe('The type of contract being analyzed.').default('NDA'),
+  contractType: z.string().describe('The type of contract being analyzed.').default('NDA'),
 });
 export type AnalyzeContractRiskInput = z.infer<typeof AnalyzeContractRiskInputSchema>;
 
@@ -75,16 +75,19 @@ const extractContractMetadata = ai.defineTool({
   }),
 }, async input => {
   const metadata = await getDocumentMetadata(input.contractText);
-  return {
-    effectiveDate: metadata.effectiveDate ?? null,
-    renewalDeadline: metadata.renewalDeadline === null ? null : metadata.renewalDeadline,
-    optOutDeadline: metadata.optOutDeadline === null ? null : metadata.optOutDeadline,
-    parties: metadata.parties,
-    governingLaw: metadata.governingLaw ?? null,
-    venue: metadata.venue ?? null,
-    definitions: metadata.definitions,
-    slaReferences: metadata.slaReferences ?? [],
-  };
+    const cleanMetadata = {
+        effectiveDate: metadata.effectiveDate?.toString() ?? null,
+        renewalDeadline: metadata.renewalDeadline?.toString() ?? null,
+        optOutDeadline: metadata.optOutDeadline?.toString() ?? null,
+        parties: metadata.parties.map(party => party.toString()),
+        governingLaw: metadata.governingLaw?.toString() ?? null,
+        venue: metadata.venue?.toString() ?? null,
+        definitions: Object.fromEntries(
+            Object.entries(metadata.definitions).map(([key, value]) => [key.toString(), value.toString()])
+        ),
+        slaReferences: metadata.slaReferences?.map(ref => ref.toString()) ?? [],
+    };
+  return cleanMetadata;
 });
 
 const analyzeRisksAndGenerateSuggestions = ai.defineTool({
@@ -92,7 +95,7 @@ const analyzeRisksAndGenerateSuggestions = ai.defineTool({
   description: 'Analyzes contract text for potential risks and generates actionable redlines and clarifying questions.',
   inputSchema: z.object({
     contractText: z.string().describe('The text of the contract to analyze.'),
-    contractType: z.enum(['NDA', 'MSA']).describe('The type of contract being analyzed.'),
+    contractType: z.string().describe('The type of contract being analyzed.'),
   }),
   outputSchema: z.object({
     riskItems: z.array(
@@ -232,7 +235,7 @@ const prompt = ai.definePrompt({
   input: {
     schema: z.object({
       documentText: z.string().describe('The text content of the contract document.'),
-      contractType: z.enum(['NDA', 'MSA']).describe('The type of contract being analyzed.'),
+      contractType: z.string().describe('The type of contract being analyzed.'),
     }),
   },
   output: {
@@ -264,10 +267,5 @@ const analyzeContractRiskFlow = ai.defineFlow<
   outputSchema: AnalyzeContractRiskOutputSchema,
 }, async input => {
   const {output} = await prompt(input);
-  // Ensure renewalDeadline and optOutDeadline are numbers or null
-  if (output?.metadata) {
-    output.metadata.renewalDeadline = output.metadata.renewalDeadline === null ? null : String(output.metadata.renewalDeadline);
-    output.metadata.optOutDeadline = output.metadata.optOutDeadline === null ? null : String(output.metadata.optOutDeadline);
-  }
   return output!;
 });
