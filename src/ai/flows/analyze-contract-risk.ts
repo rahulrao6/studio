@@ -19,8 +19,8 @@ export type AnalyzeContractRiskInput = z.infer<typeof AnalyzeContractRiskInputSc
 const AnalyzeContractRiskOutputSchema = z.object({
   metadata: z.object({
     effectiveDate: z.string().optional().describe('The effective date of the contract, if found.'),
-    renewalDeadline: z.string().nullable().optional().describe('The renewal deadline of the contract, if found.'),
-    optOutDeadline: z.string().nullable().optional().describe('The opt-out deadline of the contract, if found.'),
+    renewalDeadline: z.string().optional().describe('The renewal deadline of the contract, if found. if not found, then set to null'),
+    optOutDeadline: z.string().optional().describe('The opt-out deadline of the contract, if found. if not found, then set to null'),
     parties: z.array(z.string().describe('Parties identified in the contract.')).describe('Parties involved in the contract.'),
     governingLaw: z.string().optional().describe('The governing law of the contract, if specified.'),
     venue: z.string().optional().describe('The venue for dispute resolution, if specified.'),
@@ -32,7 +32,7 @@ const AnalyzeContractRiskOutputSchema = z.object({
     sections: z.array(z.object({
       sectionTitle: z.string(),
       summary: z.string(),
-      highestRiskClause: z.string().nullable().optional().describe('The highest-risk clause in the section.')
+      highestRiskClause: z.string().optional().describe('The highest-risk clause in the section.')
     })).describe('Plain-English summaries per section of the contract.')
   }).describe('Executive summaries of the contract.'),
   riskItems: z.array(
@@ -63,8 +63,8 @@ const extractContractMetadata = ai.defineTool({
   }),
   outputSchema: z.object({
     effectiveDate: z.string().optional().describe('The effective date of the contract, if found.'),
-    renewalDeadline: z.string().nullable().optional().describe('The renewal deadline of the contract, if found.'),
-    optOutDeadline: z.string().nullable().optional().describe('The opt-out deadline of the contract, if found.'),
+    renewalDeadline: z.string().optional().describe('The renewal deadline of the contract, if found.'),
+    optOutDeadline: z.string().optional().describe('The opt-out deadline of the contract, if found.'),
     parties: z.array(z.string().describe('Parties identified in the contract.')).describe('Parties involved in the contract.'),
     governingLaw: z.string().optional().describe('The governing law of the contract, if specified.'),
     venue: z.string().optional().describe('The venue for dispute resolution, if specified.'),
@@ -154,7 +154,7 @@ const generateExecutiveAndSectionSummaries = ai.defineTool({
       sections: z.array(z.object({
         sectionTitle: z.string(),
         summary: z.string(),
-        highestRiskClause: z.string().nullable().optional().describe('The highest-risk clause in the section.')
+        highestRiskClause: z.string().optional().describe('The highest-risk clause in the section.')
       })).describe('Plain-English summaries per section of the contract.')
     }).describe('Executive summaries of the contract.'),
   }),

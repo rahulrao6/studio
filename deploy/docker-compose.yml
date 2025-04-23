@@ -1,5 +1,38 @@
+version: "3.8"
+
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    volumes:
+      - model_volume:/app/models
+      - data_volume:/app/data
+    environment:
+      - DATABASE_URL=sqlite:///data/app.db  # Persist SQLite DB in volume
+      - MODEL_PATH=/app/models
+      - ENVIRONMENT=production
+      - LOG_LEVEL=INFO
+      - JWT_SECRET=your-super-secret-jwt-key  # Change this!
+      - PII_ENCRYPTION_KEY=your-16-byte-key    # Change this!
+      - FEATURE_FLAG_SEMANTIC_SEARCH=false
+      - FEATURE_FLAG_ADVANCED_RISK=true
+      - FEATURE_FLAG_PII_DETECTION=true
+      - ENABLE_ENCRYPTION=false
+    depends_on:
+      # - redis  # Uncomment if using Redis
+      []
+
+  # redis:  # Optional Redis service (for caching, vector DB)
+  #   image: redis:latest
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis_data:/data
+
+volumes:
+  model_volume:  # For persistent storage of ML models
+  data_volume:   # For persistent storage of data (e.g., SQLite DB)
+  # redis_data:    # For persistent Redis data (if used)

@@ -5,19 +5,19 @@ export interface DocumentMetadata {
   /**
    * The file size of the document in bytes.
    */
-  fileSize?: number;
+  fileSize: number;
   /**
    * The number of pages in the document.
    */
-  pageCount?: number;
+  pageCount: number;
   /**
    * The number of words in the document.
    */
-  wordCount?: number;
+  wordCount: number;
   /**
    * A list of detected dates within the document.
    */
-  detectedDates?: string[];
+  detectedDates: string[];
   /**
    * A list of parties involved in the contract.
    */
@@ -61,8 +61,12 @@ export interface DocumentMetadata {
  */
 export async function getDocumentMetadata(document: string): Promise<DocumentMetadata> {
   // TODO: Implement this by calling an API or a local service.
-  
+
   return {
+    fileSize: 123456,
+    pageCount: 10,
+    wordCount: 2500,
+    detectedDates: ['January 1, 2024', 'December 31, 2024'],
     parties: ['Company A', 'Company B'],
     renewalDeadline: null,
     optOutDeadline: null,
