@@ -76,8 +76,8 @@ const extractContractMetadata = ai.defineTool({
   // TODO: Implement extraction of definitions and SLA references
   return {
     effectiveDate: metadata.effectiveDate,
-    renewalDeadline: metadata.renewalDeadline ?? null,
-    optOutDeadline: metadata.optOutDeadline ?? null,
+    renewalDeadline: metadata.renewalDeadline === null ? null : metadata.renewalDeadline,
+    optOutDeadline: metadata.optOutDeadline === null ? null : metadata.optOutDeadline,
     parties: metadata.parties,
     governingLaw: metadata.governingLaw,
     venue: metadata.venue,

@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 interface DocumentUploadProps {
   onDocumentUpload: (text: string) => void;
@@ -21,8 +22,10 @@ export const DocumentUpload: React.FC<DocumentUploadProps> = ({ onDocumentUpload
 
   return (
     <div>
+      <Label htmlFor="contract-text">Paste Contract Text Here</Label>
       <Textarea
-        placeholder="Paste contract text here..."
+        id="contract-text"
+        placeholder="Enter contract text..."
         className="w-full h-48 mb-4"
         value={documentText}
         onChange={handleTextChange}
