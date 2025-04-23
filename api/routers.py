@@ -45,6 +45,28 @@ async def upload_contract(
     """
     Upload a contract document (PDF, DOCX, TXT) for analysis.
     Performs OCR/Zonal parsing, text normalization, and PII redaction.
+
+    Args:
+        file (UploadFile): The contract document to upload.
+        background_tasks (BackgroundTasks): The background tasks to run after the file is uploaded.
+        current_user (User): The current user.
+        db (Session): The database session.
+
+    Returns:
+        Contract: The contract object.
+
+    Raises:
+        HTTPException: If the upload fails.
+
+    To alter this endpoint:
+    1. Modify the file types accepted in the `file_type` variable.
+    2. Change the `process_uploaded_file` function to perform additional preprocessing steps.
+    3. Modify the `Contract` model to include additional metadata fields.
+
+    To improve the accuracy of this endpoint:
+    1. Improve the OCR/Zonal parsing logic.
+    2. Improve the text normalization logic.
+    3. Improve the PII redaction logic.
     """
     try:
         file_content = await file.read()
@@ -111,6 +133,27 @@ async def get_contract_clauses(
 ):
     """
     Returns typed clauses, graph edges, and precision scores for a given contract.
+
+    Args:
+        contract_id (int): The ID of the contract to analyze.
+        current_user (User): The current user.
+        db (Session): The database session.
+
+    Returns:
+        List[Clause]: A list of clauses in the contract.
+
+    Raises:
+        HTTPException: If the contract is not found or if an error occurs during clause extraction.
+
+    To alter this endpoint:
+    1. Modify the `ClauseExtractionService` class to use a different NLP model.
+    2. Change the logic for identifying cross-references between clauses.
+    3. Modify the `Clause` model to include additional fields.
+
+    To improve the accuracy of this endpoint:
+    1. Improve the clause extraction logic.
+    2. Improve the cross-reference identification logic.
+    3. Improve the clause typing logic.
     """
     try:
         contract = db.get(ContractModel, contract_id)
@@ -139,6 +182,26 @@ async def get_contract_obligations(
 ):
     """
     Returns structured obligations/rights JSON for a given contract.
+
+    Args:
+        contract_id (int): The ID of the contract to analyze.
+        current_user (User): The current user.
+        db (Session): The database session.
+
+    Returns:
+        List[Obligation]: A list of obligations in the contract.
+
+    Raises:
+        HTTPException: If the contract is not found or if an error occurs during obligation mapping.
+
+    To alter this endpoint:
+    1. Modify the `ObligationMappingService` class to use a different NLP model.
+    2. Change the logic for identifying obligations and rights.
+    3. Modify the `Obligation` model to include additional fields.
+
+    To improve the accuracy of this endpoint:
+    1. Improve the obligation mapping logic.
+    2. Improve the right mapping logic.
     """
     try:
         contract = db.get(ContractModel, contract_id)
@@ -171,6 +234,26 @@ async def get_contract_rights(
 ):
     """
     Returns structured obligations/rights JSON for a given contract.
+
+    Args:
+        contract_id (int): The ID of the contract to analyze.
+        current_user (User): The current user.
+        db (Session): The database session.
+
+    Returns:
+        List[Right]: A list of rights in the contract.
+
+    Raises:
+        HTTPException: If the contract is not found or if an error occurs during right mapping.
+
+    To alter this endpoint:
+    1. Modify the `ObligationMappingService` class to use a different NLP model.
+    2. Change the logic for identifying obligations and rights.
+    3. Modify the `Right` model to include additional fields.
+
+    To improve the accuracy of this endpoint:
+    1. Improve the obligation mapping logic.
+    2. Improve the right mapping logic.
     """
     try:
         contract = db.get(ContractModel, contract_id)
@@ -197,6 +280,7 @@ async def get_contract_rights(
 
 @router.get(
     "/contracts/{contract_id}/risk", response_model=RiskReport, tags=["Analysis"]
+)
 async def get_contract_risk_report(
     contract_id: int,
     current_user: User = Depends(get_current_user),
@@ -204,6 +288,27 @@ async def get_contract_risk_report(
 ):
     """
     Returns a per-clause and overall risk report with remediation suggestions and regulatory citations.
+
+    Args:
+        contract_id (int): The ID of the contract to analyze.
+        current_user (User): The current user.
+        db (Session): The database session.
+
+    Returns:
+        RiskReport: The risk report for the contract.
+
+    Raises:
+        HTTPException: If the contract is not found or if an error occurs during risk scoring.
+
+    To alter this endpoint:
+    1. Modify the `RiskScoringService` class to use a different machine learning model.
+    2. Change the risk factors and weights.
+    3. Modify the `RiskReport` model to include additional fields.
+
+    To improve the accuracy of this endpoint:
+    1. Improve the risk scoring logic.
+    2. Improve the regulatory citation logic.
+    3. Improve the remediation suggestion logic.
     """
     try:
         contract = db.get(ContractModel, contract_id)
@@ -234,6 +339,27 @@ async def get_contract_metadata(
 ):
     """
     Returns the metadata of a contract.
+
+    Args:
+        contract_id (int): The ID of the contract to analyze.
+        current_user (User): The current user.
+        db (Session): The database session.
+
+    Returns:
+        DocumentMetadata: The metadata of the contract.
+
+    Raises:
+        HTTPException: If the contract is not found or if an error occurs during metadata extraction.
+
+    To alter this endpoint:
+    1. Modify the `get_document_metadata` function to extract additional metadata fields.
+    2. Change the logic for extracting specific metadata fields.
+    3. Modify the `DocumentMetadata` model to include additional fields.
+
+    To improve the accuracy of this endpoint:
+    1. Improve the metadata extraction logic.
+    2. Improve the date parsing logic.
+    3. Improve the party identification logic.
     """
     try:
         contract = db.get(ContractModel, contract_id)
@@ -259,6 +385,27 @@ async def compare_contract(
 ):
     """
     Returns the top-N similar contracts from the database.
+
+    Args:
+        contract_id (int): The ID of the contract to compare.
+        num_results (int): The number of similar contracts to return.
+        current_user (User): The current user.
+        db (Session): The database session.
+
+    Returns:
+        List[Contract]: A list of similar contracts.
+
+    Raises:
+        HTTPException: If the contract is not found or if an error occurs during document retrieval.
+
+    To alter this endpoint:
+    1. Modify the `DocumentRetrievalService` class to use a different semantic similarity search algorithm.
+    2. Change the logic for filtering the search results.
+    3. Modify the `Contract` model to include additional fields.
+
+    To improve the accuracy of this endpoint:
+    1. Improve the semantic similarity search logic.
+    2. Improve the filtering logic.
     """
     try:
         contract = db.get(ContractModel, contract_id)
@@ -280,6 +427,25 @@ async def analyze_contract_endpoint(
 ):
     """
     Analyzes a contract using the AI flow and returns the results.
+
+    Args:
+        input_data (AnalyzeContractRiskInput): The input data for the AI analysis.
+
+    Returns:
+        AnalyzeContractRiskOutput: The results of the AI analysis.
+
+    Raises:
+        HTTPException: If an error occurs during the AI analysis.
+
+    To alter this endpoint:
+    1. Modify the `analyzeContractRisk` function to use a different AI model.
+    2. Change the input data schema.
+    3. Modify the output data schema.
+
+    To improve the accuracy of this endpoint:
+    1. Improve the AI model.
+    2. Improve the training data.
+    3. Improve the feature extraction logic.
     """
     try:
         results = await analyzeContractRisk(input_data)

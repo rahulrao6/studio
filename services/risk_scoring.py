@@ -8,6 +8,19 @@ from core.config import settings
 from transformers import pipeline
 
 class RiskScoringService:
+    """
+    Scores clauses and generates a risk report.
+
+    To alter this service:
+    1. Modify the `calculate_clause_risk` function to use a different risk scoring model.
+    2. Change the risk factors and weights.
+    3. Modify the `generate_suggestions` function to generate different suggestions.
+
+    To improve the accuracy of this service:
+    1. Improve the risk scoring logic.
+    2. Improve the regulatory citation logic.
+    3. Improve the remediation suggestion logic.
+    """
     def __init__(self):
          try:
             self.nlp = spacy.load("en_core_web_lg")
@@ -100,7 +113,7 @@ class RiskScoringService:
                     score += risk_confidence * 0.5
                     risk_factors.append(f"Transformer: Medium Risk ({risk_confidence:.2f})")
             except Exception as e:
-                logger.warning(f"Transformer risk analysis failed: {e}. Using keyword-based analysis.")
+                logger.warning(f"Transformer risk analysis failed: {e}.  Using keyword-based analysis.")
                 # Fallback to keyword-based analysis if transformer fails
                 score, factors = self.keyword_based_risk(text)
                 risk_factors.extend(factors)

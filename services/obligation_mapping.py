@@ -6,6 +6,18 @@ import spacy
 from utils.logging import logger
 
 class ObligationMappingService:
+    """
+    Maps obligations and rights from a list of clauses using NLP.
+
+    To alter this service:
+    1. Modify the `extract_obligation` and `extract_right` functions to use a different information extraction model.
+    2. Change the logic for identifying obligations and rights.
+    3. Modify the `Obligation` and `Right` models to include additional fields.
+
+    To improve the accuracy of this service:
+    1. Improve the information extraction logic.
+    2. Improve the obligation and right identification logic.
+    """
     def __init__(self):
         try:
             self.nlp = spacy.load("en_core_web_lg")  # Ensure you have this model
@@ -19,6 +31,12 @@ class ObligationMappingService:
     def map_obligations(self, clauses: List[Clause]) -> Tuple[List[Obligation], List[Right]]:
         """
         Maps obligations and rights from a list of clauses using NLP.
+
+        Args:
+            clauses (List[Clause]): A list of Clause objects.
+
+        Returns:
+            Tuple[List[Obligation], List[Right]]: A tuple containing a list of Obligation objects and a list of Right objects.
         """
         obligations: List[Obligation] = []
         rights: List[Right] = []
@@ -39,6 +57,12 @@ class ObligationMappingService:
         """
         Extracts obligation details from a clause using NLP.
         This is a placeholder and needs to be replaced with a proper information extraction model.
+
+        Args:
+            clause_text (str): The text of the clause to extract obligation details from.
+
+        Returns:
+            Obligation | None: An Obligation object, or None if no obligation is found.
         """
         doc = self.nlp(clause_text)
         party = "Unknown"
@@ -64,6 +88,12 @@ class ObligationMappingService:
         """
         Extracts right details from a clause using NLP.
         This is a placeholder and needs to be replaced with a proper information extraction model.
+
+        Args:
+            clause_text (str): The text of the clause to extract right details from.
+
+        Returns:
+            Right | None: A Right object, or None if no right is found.
         """
         doc = self.nlp(clause_text)
         party = "Unknown"

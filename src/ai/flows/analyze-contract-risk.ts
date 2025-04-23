@@ -57,6 +57,22 @@ export async function analyzeContractRisk(input: AnalyzeContractRiskInput): Prom
   return analyzeContractRiskFlow(input);
 }
 
+/**
+ * This tool extracts metadata from the contract document.
+ *
+ * To alter this tool:
+ * 1. Modify the inputSchema to accept additional parameters.
+ * 2. Change the getDocumentMetadata function to extract additional metadata fields.
+ * 3. Modify the outputSchema to include additional metadata fields.
+ *
+ * To improve the accuracy of this tool:
+ * 1. Improve the metadata extraction logic in the getDocumentMetadata function.
+ *
+ * To test this tool:
+ * 1. Create a sample contract document.
+ * 2. Call the extractContractMetadata tool with the sample document.
+ * 3. Verify that the extracted metadata is correct.
+ */
 const extractContractMetadata = ai.defineTool({
   name: 'extractContractMetadata',
   description: 'Extracts comprehensive metadata from a contract document.',
@@ -90,6 +106,23 @@ const extractContractMetadata = ai.defineTool({
   return cleanMetadata;
 });
 
+/**
+ * This tool analyzes contract text for potential risks and generates actionable redlines and clarifying questions.
+ *
+ * To alter this tool:
+ * 1. Modify the inputSchema to accept additional parameters.
+ * 2. Change the risk detection logic to identify additional risks.
+ * 3. Modify the outputSchema to include additional risk information.
+ *
+ * To improve the accuracy of this tool:
+ * 1. Improve the risk detection logic.
+ * 2. Improve the suggested fix and clarifying question generation logic.
+ *
+ * To test this tool:
+ * 1. Create a sample contract document.
+ * 2. Call the analyzeRisksAndGenerateSuggestions tool with the sample document.
+ * 3. Verify that the identified risks, suggested fixes, and clarifying questions are correct.
+ */
 const analyzeRisksAndGenerateSuggestions = ai.defineTool({
   name: 'analyzeRisksAndGenerateSuggestions',
   description: 'Analyzes contract text for potential risks and generates actionable redlines and clarifying questions.',
@@ -185,6 +218,22 @@ const analyzeRisksAndGenerateSuggestions = ai.defineTool({
   };
 });
 
+/**
+ * This tool generates an executive summary of the contract, both overall and per section, highlighting key risks.
+ *
+ * To alter this tool:
+ * 1. Modify the inputSchema to accept additional parameters.
+ * 2. Change the executive summary generation logic to generate different summaries.
+ * 3. Modify the outputSchema to include additional summary information.
+ *
+ * To improve the accuracy of this tool:
+ * 1. Improve the executive summary generation logic.
+ *
+ * To test this tool:
+ * 1. Create a sample contract document.
+ * 2. Call the generateExecutiveAndSectionSummaries tool with the sample document.
+ * 3. Verify that the generated summaries are correct.
+ */
 const generateExecutiveAndSectionSummaries = ai.defineTool({
   name: 'generateExecutiveAndSectionSummaries',
   description: 'Generates an executive summary of the contract, both overall and per section, highlighting key risks.',
@@ -218,6 +267,22 @@ const generateExecutiveAndSectionSummaries = ai.defineTool({
   };
 });
 
+/**
+ * This tool assesses the contract's compliance with relevant regulations.
+ *
+ * To alter this tool:
+ * 1. Modify the inputSchema to accept additional parameters.
+ * 2. Change the regulatory compliance assessment logic to assess compliance with different regulations.
+ * 3. Modify the outputSchema to include additional compliance information.
+ *
+ * To improve the accuracy of this tool:
+ * 1. Improve the regulatory compliance assessment logic.
+ *
+ * To test this tool:
+ * 1. Create a sample contract document.
+ * 2. Call the assessRegulatoryCompliance tool with the sample document.
+ * 3. Verify that the compliance score is correct.
+ */
 const assessRegulatoryCompliance = ai.defineTool({
   name: 'assessRegulatoryCompliance',
   description: 'Assesses the contract\'s compliance with relevant regulations.',
@@ -258,6 +323,24 @@ const prompt = ai.definePrompt({
   Format your output as a JSON object matching the schema above.`,
 });
 
+/**
+ * This flow analyzes contract documents and identifies potential risks, key dates, parties, and definitions.
+ *
+ * To alter this flow:
+ * 1. Modify the inputSchema to accept additional parameters.
+ * 2. Change the prompt to use different tools or to generate different outputs.
+ * 3. Modify the outputSchema to include additional information.
+ *
+ * To improve the accuracy of this flow:
+ * 1. Improve the risk detection logic in the analyzeRisksAndGenerateSuggestions tool.
+ * 2. Improve the metadata extraction logic in the extractContractMetadata tool.
+ * 3. Improve the executive summary generation logic in the generateExecutiveAndSectionSummaries tool.
+ *
+ * To test this flow:
+ * 1. Create a sample contract document.
+ * 2. Call the analyzeContractRiskFlow with the sample document.
+ * 3. Verify that the output is correct.
+ */
 const analyzeContractRiskFlow = ai.defineFlow<
   typeof AnalyzeContractRiskInputSchema,
   typeof AnalyzeContractRiskOutputSchema

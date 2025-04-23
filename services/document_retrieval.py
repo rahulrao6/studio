@@ -6,6 +6,18 @@ from core.config import settings
 from utils.logging import logger
 
 class DocumentRetrievalService:
+    """
+    Retrieves similar documents from the database using semantic similarity search with Sentence Transformers.
+
+    To alter this service:
+    1. Modify the `__init__` function to use a different Sentence Transformer model.
+    2. Change the logic for calculating semantic similarity.
+    3. Modify the `retrieve_similar_documents` function to filter the search results based on additional criteria.
+
+    To improve the accuracy of this service:
+    1. Improve the semantic similarity search logic.
+    2. Improve the filtering logic.
+    """
     def __init__(self):
         try:
             self.model = SentenceTransformer('all-mpnet-base-v2')  # Or another suitable model
@@ -18,6 +30,14 @@ class DocumentRetrievalService:
         """
         Retrieves the top-N most similar documents to the given query from the database
         using semantic similarity search with Sentence Transformers.
+
+        Args:
+            query (str): The query string to search for similar documents.
+            top_n (int): The number of similar documents to return.
+            db (Session): The database session.
+
+        Returns:
+            List[Contract]: A list of similar Contract objects.
         """
         if not self.model or not db:
             logger.warning("Semantic search is disabled (model or database not initialized).")

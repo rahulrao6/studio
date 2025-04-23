@@ -8,6 +8,21 @@ from core.config import settings
 from transformers import pipeline
 
 class ClauseExtractionService:
+    """
+    Extracts clauses from a contract text using NLP, classifies them, and
+    identifies cross-references. Implements a heuristic approach with semantic
+    segmentation and attempts to recognize clause titles/headers.
+
+    To alter this service:
+    1. Modify the `segment_text` function to use a different segmentation algorithm.
+    2. Change the `determine_clause_type` function to use a different classification model.
+    3. Modify the `find_clause_references` function to use a different cross-reference identification algorithm.
+
+    To improve the accuracy of this service:
+    1. Improve the segmentation logic.
+    2. Improve the clause typing logic.
+    3. Improve the cross-reference identification logic.
+    """
     def __init__(self):
         try:
             self.nlp: Language = spacy.load("en_core_web_lg")
@@ -36,6 +51,12 @@ class ClauseExtractionService:
         Extracts clauses from a contract text using NLP, classifies them, and
         identifies cross-references. Implements a heuristic approach with semantic
         segmentation and attempts to recognize clause titles/headers.
+
+        Args:
+            text (str): The contract text to extract clauses from.
+
+        Returns:
+            List[Clause]: A list of Clause objects.
         """
         clauses: List[Clause] = []
         clause_id = 0
@@ -63,6 +84,12 @@ class ClauseExtractionService:
     def segment_text(self, text: str) -> List[str]:
         """
         Segments the contract text into clauses using regex, spaCy, and header detection.
+
+        Args:
+            text (str): The contract text to segment.
+
+        Returns:
+            List[str]: A list of segments.
         """
         # Split by common clause delimiters (e.g., "1. ", "A. ", "(a)")
         clause_delimiters = r"\n(?:\d+\.|[A-Z]\.|[a-z]\))\s"
@@ -82,6 +109,12 @@ class ClauseExtractionService:
         """
         Determines the type of a clause based on NLP and Transformer model.
         Leverages self.is_clause_header to improve accuracy.
+
+        Args:
+            text (str): The clause text to determine the type of.
+
+        Returns:
+            str: The type of the clause.
         """
         if self.is_clause_header(text):
             return "header"  # Mark as header
@@ -101,6 +134,12 @@ class ClauseExtractionService:
     def is_clause_header(self, text: str) -> bool:
         """
         Heuristic to determine if a segment is a clause header/title.
+
+        Args:
+            text (str): The clause text to check.
+
+        Returns:
+            bool: True if the text is a clause header, False otherwise.
         """
         # Check for common header patterns: uppercase, short length, numbering
         if re.match(r"^(?:\d+\.|[A-Z]\.|[a-z]\))", text):
