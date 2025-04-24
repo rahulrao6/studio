@@ -3,9 +3,22 @@ import re
 import spacy
 from spacy.language import Language
 from utils.logging import logger
+from typing_extensions import Dict, List, TypedDict
+
 
 # spaCy model for NLP tasks
-nlp: Language = spacy.load("en_core_web_lg")
+nlp: Language = spacy.load('en_core_web_lg')
+
+class DocumentMetadata(TypedDict):
+    fileSize: int
+    pageCount: int
+    wordCount: int
+    detectedDates: List[str]
+    parties: List[str]
+    governingLaw: str | None
+    venue: str | None
+    definitions: Dict[str, str]
+    slaReferences: List[str]
 
 def extract_dates(text: str) -> List[str]:
     """

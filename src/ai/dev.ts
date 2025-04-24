@@ -1,1 +1,1 @@
-import '@/ai/flows/analyze-contract-risk.ts';
+import '@/ai/flows/analyze_contract_risk';

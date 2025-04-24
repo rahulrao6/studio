@@ -44,14 +44,14 @@ class RiskScoringService:
             self.risk_analyzer = None
 
         # Expanded risk keywords (can load from file or DB for dynamic updates)
-        self.high_risk_keywords = ["sole discretion", "unilateral", "without notice", "absolute discretion", "indemnify", "hold harmless"]
-        self.medium_risk_keywords = ["may", "reasonable", "commercially reasonable", "material adverse", "best efforts"]
-        self.auto_renewal_patterns = [r"automatically renew", r"unless notice is given"]
-        self.force_majeure_patterns = [r"act of god", r"unforeseen circumstances"]
-        self.security_patterns = [r"data breach", r"cybersecurity incident"]
-        self.data_privacy_patterns = [r"personal data", r"personally identifiable information", r"pii"]
-        self.missing_injunctive_relief_pattern = r"injunctive relief"
-        self.missing_liquidated_damages_pattern = r"liquidated damages"
+            self.high_risk_keywords = ["sole discretion", "unilateral", "without notice", "absolute discretion", "indemnify", "hold harmless"]
+            self.medium_risk_keywords = ["may", "reasonable", "commercially reasonable", "material adverse", "best efforts"]
+            self.auto_renewal_patterns = [r"automatically renew", r"unless notice is given"]
+            self.force_majeure_patterns = [r"act of god", r"unforeseen circumstances"]
+            self.security_patterns = [r"data breach", r"cybersecurity incident"]
+            self.data_privacy_patterns = [r"personal data", r"personally identifiable information", r"pii"]
+            self.missing_injunctive_relief_pattern = r"injunctive relief"
+            self.missing_liquidated_damages_pattern = r"liquidated damages"
 
     def score_clauses(self, clauses: List[Clause]) -> RiskReport:
         """Scores clauses and generates a risk report."""

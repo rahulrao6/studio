@@ -38,6 +38,7 @@ class Settings(BaseSettings):
         "env_file": ".env"  # This is how you specify env file in v2
     }
 
+    DATABASE_URL: str = "sqlite:///./app.db"
 
 @lru_cache()
 def get_settings():

@@ -26,3 +26,8 @@ passlib[bcrypt]
 pydantic-settings
 spacy
 bcrypt==4.0.1
+huggingface_hub==0.16.4
+sentence-transformers==2.2.2
+pdfminer.six
+python-docx
+genkit

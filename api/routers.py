@@ -12,7 +12,7 @@ from models.obligation import Obligation
 from models.right import Right
 from models.risk_report import RiskReport
 from services.clause_extraction import ClauseExtractionService
-from services.document_metadata import get_document_metadata, DocumentMetadata
+from services.document_metadata import get_document_metadata
 from services.obligation_mapping import ObligationMappingService
 from services.risk_scoring import RiskScoringService
 from core.config import settings
@@ -29,7 +29,8 @@ from models.contract import Contract as ContractModel  # Renamed to avoid collis
 from services.document_retrieval import DocumentRetrievalService
 import os
 from services.document_upload import process_uploaded_file
-from src.ai.flows.analyze_contract_risk import analyzeContractRisk, AnalyzeContractRiskInput, AnalyzeContractRiskOutput
+from services.analyze_contract_risk import analyzeContractRisk, AnalyzeContractRiskInput, AnalyzeContractRiskOutput
+from services.document_metadata import DocumentMetadata
 
 router = APIRouter()
 

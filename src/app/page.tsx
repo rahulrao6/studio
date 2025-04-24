@@ -5,7 +5,7 @@ import { DocumentUpload } from "@/components/DocumentUpload";
 import { MetadataDisplay } from "@/components/MetadataDisplay";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { analyzeContractRisk } from "@/ai/flows/analyze-contract-risk";
+import { analyzeContractRisk } from "@/ai/flows/analyze_contract_risk";
 import { Toaster } from "@/components/ui/toaster";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
